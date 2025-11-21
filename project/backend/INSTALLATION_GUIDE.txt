@@ -1,0 +1,302 @@
+================================================================================
+CYBERSECURITY CHATBOT BACKEND - INSTALLATION GUIDE
+================================================================================
+
+QUICK INSTALLATION (5 MINUTES)
+================================================================================
+
+1. NAVIGATE TO BACKEND DIRECTORY
+   $ cd backend
+
+2. INSTALL DEPENDENCIES
+   $ pip install -r requirements.txt
+
+3. SET UP ENVIRONMENT
+   $ cp .env.example .env
+   $ # Edit .env with your API keys (GEMINI_API_KEY, SUPABASE credentials)
+
+4. CREATE DATABASE TABLES
+   $ python seed_data.py
+
+5. START SERVER
+   $ python app.py
+
+6. TEST
+   $ curl http://localhost:5000/api/health
+
+================================================================================
+DETAILED SETUP GUIDE
+================================================================================
+
+STEP 1: PREREQUISITES
+- Python 3.8+ installed
+- pip package manager
+- Google Gemini API key (free at https://ai.google.dev/)
+- Supabase account with project credentials
+
+STEP 2: GET YOUR CREDENTIALS
+- Google Gemini API Key: https://ai.google.dev/ → Get API Key
+- Supabase URL: Your project → Settings → API → Project URL
+- Supabase Anon Key: Your project → Settings → API → Anon public key
+- Supabase Service Key: Your project → Settings → API → Service role secret
+
+STEP 3: CONFIGURE ENVIRONMENT
+a) Copy template:
+   $ cp .env.example .env
+
+b) Edit .env file with your credentials:
+   FLASK_ENV=development
+   FLASK_DEBUG=True
+   PORT=5000
+   GEMINI_API_KEY=your_key_here
+   SUPABASE_URL=https://your-project.supabase.co
+   SUPABASE_KEY=your_anon_key
+   SUPABASE_SERVICE_KEY=your_service_role_key
+
+STEP 4: INSTALL DEPENDENCIES
+   $ pip install -r requirements.txt
+
+   This will install:
+   - Flask 3.0.0
+   - Flask-CORS 4.0.0
+   - python-dotenv 1.0.0
+   - google-generativeai 0.3.0
+   - supabase 2.3.4
+   - requests 2.31.0
+
+STEP 5: SET UP DATABASE
+Option A - Automatic (Recommended):
+   $ python seed_data.py
+   
+   This will create tables and populate placeholder data.
+
+Option B - Manual:
+   1. Go to Supabase Dashboard
+   2. Open SQL Editor
+   3. Create new query
+   4. Copy content from: ../supabase/migrations/001_create_cybersecurity_tables.sql
+   5. Execute query
+
+STEP 6: START THE SERVER
+   $ python app.py
+   
+   Output should show:
+   * Running on http://0.0.0.0:5000
+   * Debug mode: on
+
+STEP 7: TEST THE INSTALLATION
+Open a new terminal window and test:
+
+a) Health Check:
+   $ curl http://localhost:5000/api/health
+   Response: {"status": "healthy", "service": "cybersecurity_chatbot"}
+
+b) List Countries:
+   $ curl http://localhost:5000/api/countries
+   Response: {"countries": {"NYC": "...", "GERMANY": "...", "SOUTH_KOREA": "..."}}
+
+c) Create Session:
+   $ curl -X POST http://localhost:5000/api/session/create \
+     -H "Content-Type: application/json" \
+     -d '{"country_code":"NYC"}'
+   Response: {"session_id": "...", "user_id": "...", "message": "Welcome!..."}
+
+d) Send Message (replace SESSION_ID):
+   $ curl -X POST http://localhost:5000/api/chat \
+     -H "Content-Type: application/json" \
+     -d '{"session_id":"SESSION_ID","message":"What is SHIELD?"}'
+   Response: {"response": "The SHIELD Act...", "success": true}
+
+================================================================================
+USING THE STARTUP SCRIPT
+================================================================================
+
+On macOS/Linux:
+   $ chmod +x run.sh
+   $ ./run.sh
+
+This will:
+1. Create virtual environment if needed
+2. Activate it
+3. Install dependencies
+4. Start the server
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ISSUE: "ModuleNotFoundError: No module named 'flask'"
+SOLUTION: 
+   $ pip install -r requirements.txt
+   Make sure you're in the backend directory
+
+ISSUE: "GEMINI_API_KEY not found"
+SOLUTION:
+   1. Check .env file exists: ls -la .env
+   2. Check it has GEMINI_API_KEY=your_key
+   3. Verify the key is correct from https://ai.google.dev/
+
+ISSUE: "Connection to Supabase failed"
+SOLUTION:
+   1. Check .env has correct SUPABASE_URL (includes https://)
+   2. Check SUPABASE_KEY is correct (anon key, not service key)
+   3. Verify Supabase project is active
+
+ISSUE: "Address already in use"
+SOLUTION:
+   1. Change PORT in .env to different value (e.g., 5001)
+   2. Or kill process: kill -9 $(lsof -t -i :5000)
+
+ISSUE: "No tables in Supabase"
+SOLUTION:
+   1. Run: python seed_data.py
+   2. Or manually execute SQL migration in Supabase editor
+
+ISSUE: "API returns 500 error"
+SOLUTION:
+   1. Check Flask debug output in terminal
+   2. Verify database connection
+   3. Check API key validity
+   4. Review .env configuration
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. TEST THE API
+   - Try all endpoints from USAGE_EXAMPLES.md
+   - Test with different messages and countries
+   - Monitor console for any errors
+
+2. ADD YOUR DATA
+   - Research and document cybersecurity laws for each country
+   - Edit seed_data.py with your research
+   - Run: python seed_data.py
+   - Or insert directly via Supabase dashboard
+
+3. INTEGRATE WITH FRONTEND
+   - Use API endpoints from React/Vue/Angular app
+   - See USAGE_EXAMPLES.md for integration code
+   - Test CORS setup
+
+4. DEPLOY TO PRODUCTION
+   - Use Gunicorn: pip install gunicorn
+   - Run: gunicorn -w 4 -b 0.0.0.0:5000 app:app
+   - Set FLASK_DEBUG=False in production
+   - Configure for your cloud platform
+
+================================================================================
+FILE CHECKLIST
+================================================================================
+
+After installation, verify you have:
+
+Core Application:
+  ☑ app.py                    (Flask app, 300+ lines)
+  ☑ config.py                 (Configuration, 15 lines)
+  ☑ database.py               (Supabase client, 50+ lines)
+  ☑ gemini_service.py         (AI integration, 100+ lines)
+  ☑ conversation_manager.py   (Session management, 100+ lines)
+  ☑ constants.py              (Constants, 150+ lines)
+
+Data & Setup:
+  ☑ seed_data.py              (Seeding script, 150+ lines)
+  ☑ requirements.txt          (Dependencies)
+  ☑ .env                      (Created from .env.example)
+  ☑ .env.example              (Template)
+  ☑ run.sh                    (Startup script)
+
+Documentation:
+  ☑ README.md                 (Full docs)
+  ☑ QUICKSTART.md             (Quick start)
+  ☑ USAGE_EXAMPLES.md         (API examples)
+  ☑ INDEX.md                  (File reference)
+  ☑ INSTALLATION_GUIDE.txt    (This file)
+
+Database:
+  ☑ cybersecurity_laws        (Table in Supabase)
+  ☑ cybersecurity_guidelines  (Table in Supabase)
+  ☑ government_portals        (Table in Supabase)
+  ☑ conversations             (Table in Supabase)
+
+================================================================================
+USEFUL COMMANDS
+================================================================================
+
+# Activate virtual environment
+source venv/bin/activate  # macOS/Linux
+venv\Scripts\activate     # Windows
+
+# Deactivate virtual environment
+deactivate
+
+# Install specific package
+pip install package_name
+
+# Update dependencies
+pip install --upgrade -r requirements.txt
+
+# Check Python version
+python --version
+
+# Test port availability
+lsof -i :5000
+
+# View logs (if running in background)
+tail -f app.log
+
+# Stop server
+Ctrl+C
+
+================================================================================
+PRODUCTION DEPLOYMENT
+================================================================================
+
+1. CREATE PRODUCTION .env
+   - Set FLASK_ENV=production
+   - Set FLASK_DEBUG=False
+   - Use production API keys
+   - Set secure PORT
+
+2. USE PRODUCTION WSGI SERVER
+   $ pip install gunicorn
+   $ gunicorn -w 4 -b 0.0.0.0:5000 app:app
+
+3. CLOUD DEPLOYMENT OPTIONS
+   - Heroku: git push heroku main
+   - AWS Lambda: Use Zappa framework
+   - Google Cloud: gcloud app deploy
+   - Docker: Build image and deploy
+
+4. MONITORING
+   - Set up error tracking (Sentry, etc.)
+   - Enable application logging
+   - Monitor database performance
+   - Set up uptime monitoring
+
+================================================================================
+SUPPORT
+================================================================================
+
+For detailed information:
+- README.md - Full documentation
+- QUICKSTART.md - Quick setup
+- USAGE_EXAMPLES.md - API examples and code
+- INDEX.md - File reference
+
+For issues:
+1. Check TROUBLESHOOTING section above
+2. Review error messages in console
+3. Check .env configuration
+4. Verify API keys are valid
+5. Test database connection
+
+Resources:
+- Google Gemini: https://ai.google.dev/
+- Supabase: https://supabase.com/docs
+- Flask: https://flask.palletsprojects.com/
+- Python: https://docs.python.org/3/
+
+================================================================================
+END OF INSTALLATION GUIDE
+================================================================================
